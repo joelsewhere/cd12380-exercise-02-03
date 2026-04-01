@@ -40,11 +40,7 @@ with DAG(
 ):
 
     # -----------------------------------------------------------------------
-    # Task 1 — query active customer IDs from the database (already implemented)
-    #
-    # output_processor=lambda results: results passes the raw rows through
-    # unchanged into XCom as a list of (id, tier) tuples. Grouping is handled
-    # in the @task below so that the full result set is received at once.
+    # query active customer IDs from the database (already implemented)
     # -----------------------------------------------------------------------
     fetch_customers = SQLExecuteQueryOperator(
         task_id="fetch_customers",
@@ -54,25 +50,27 @@ with DAG(
             FROM customers
             WHERE is_active = TRUE
             ORDER BY tier, id
-        """,
-        output_processor=lambda results: results,
-    )
+            """
+        )
 
     # -----------------------------------------------------------------------
-    # Task 2 — group raw rows by tier (already implemented except return)
+    # Below a function is partially defined.
+    # This function...
+    #    a. Receives the full list of (id, tier) tuples from fetch_customers
+    #    b. Constructs a defaultdict with the following structure
+    #         {
+    #           "tier_a": [customer_id, customer_id],
+    #           "tier_b": [customer_id, customer_id],
+    #           "tier_c": [customer_id, customer_id],
+    #          }
     #
-    # Receives the full list of (id, tier) tuples from fetch_customers and
-    # groups them into a list of dicts, one per tier. Airflow can then fan
-    # .expand() out over this list to create one task instance per tier.
-    #
-    # EXERCISE 1 — complete the return statement.
+    # TASK 1 — complete the return statement.
     # Build and return a list of dicts in this shape:
     #   [
-    #       {"tier": "gold",   "customer_ids": [1, 2]},
-    #       {"tier": "silver", "customer_ids": [3]},
-    #       {"tier": "bronze", "customer_ids": [4, 5, 6]},
+    #       {"tier_a": "gold",   "customer_ids": [customer_id, customer_id]},
+    #       {"tier_b": "silver", "customer_ids": [customer_id, customer_id]},
+    #       {"tier_c": "bronze", "customer_ids": [customer_id, customer_id]},
     #   ]
-    # The `grouped` defaultdict is already populated for you above the stub.
     # -----------------------------------------------------------------------
     @task
     def group_by_tier(results: list) -> list[dict]:
@@ -84,17 +82,13 @@ with DAG(
         ### YOUR CODE HERE
 
     # -----------------------------------------------------------------------
-    # Task 3 — send outreach messages for one tier (already implemented except
-    # map_index_template)
-    #
     # One instance of this task is created per tier dict in the list returned
     # by group_by_tier. Each instance receives a single group dict with keys
     # "tier" and "customer_ids".
     #
-    # EXERCISE 2 — set map_index_template on the @task decorator so the
+    # TASK 2 — set map_index_template on the @task decorator so the
     # Airflow UI labels each instance with its tier name rather than a
     # numeric index (e.g. "send_outreach[gold]" not "send_outreach[0]").
-    # Access the tier via: {{ task.op_kwargs['group']['tier'] }}
     # -----------------------------------------------------------------------
     @task(map_index_template=None)  ### YOUR CODE HERE
     def send_outreach(group: dict) -> None:
@@ -108,10 +102,10 @@ with DAG(
             _send_message(customer_id, message)
 
     # -----------------------------------------------------------------------
-    # EXERCISE 3 — set the task dependencies.
+    # TASK 3 — set the task dependencies.
     #
-    # 1. Call group_by_tier, passing fetch_customers.output as its argument,
-    #    and assign the result to a variable called `groups`.
+    # 1. Pass the sql_output variable defined below to the group_by_tier task
+    #    as an argument. Assign the output of group_by_tier to the variable `groups`
     # 2. Call send_outreach.expand(), passing `groups` as the `group` kwarg,
     #    so one task instance is created per tier dict.
     #
@@ -120,5 +114,6 @@ with DAG(
     #                                    >> send_outreach[silver]
     #                                    >> send_outreach[bronze]
     # -----------------------------------------------------------------------
-
+    sql_output = fetch_customers.output
+    
     ### YOUR CODE HERE

@@ -33,11 +33,6 @@ def _send_message(customer_id: int, message: str) -> None:
     print(f"  → customer {customer_id}: {message}")
 
 
-# ---------------------------------------------------------------------------
-# EXERCISE 1 SOLUTION — output_processor function
-# ---------------------------------------------------------------------------
-
-
 
 # ---------------------------------------------------------------------------
 # DAG definition
@@ -64,13 +59,17 @@ with DAG(
         grouped = defaultdict(list)
         for customer_id, tier in results:
             grouped[tier].append(customer_id)
+
+        # -----------------------------------------------------------------------
+        # TASK 1 SOLUTION — Set list structure for dynamic tasks by tier
+        # -----------------------------------------------------------------------
         return [
             {"tier": tier, "customer_ids": customer_ids}
             for tier, customer_ids in grouped.items()
         ]
 
     # -----------------------------------------------------------------------
-    # EXERCISE 2 SOLUTION — dynamic task with map_index_template
+    # TASK 2 SOLUTION — dynamic task with map_index_template
     # -----------------------------------------------------------------------
 
     @task(map_index_template="{{ task.op_kwargs['group']['tier'] }}")
@@ -85,7 +84,7 @@ with DAG(
             _send_message(customer_id, message)
 
     # -----------------------------------------------------------------------
-    # EXERCISE 3 SOLUTION — wire the dynamic expansion
+    # TASK 3 SOLUTION — wire the dynamic expansion
     # -----------------------------------------------------------------------
     groups = group_by_tier(fetch_customers.output)
     send_outreach.expand(group=groups)
