@@ -36,9 +36,6 @@ def _send_message(customer_id: int, message: str) -> None:
 
 with DAG(
     dag_id="customer_outreach_pipeline",
-    schedule="@weekly",
-    start_date=datetime(2026, 1, 1),
-    catchup=False,
     tags=["exercise", "dynamic-mapping"],
 ):
 
