@@ -37,16 +37,6 @@ def _send_message(customer_id: int, message: str) -> None:
 # EXERCISE 1 SOLUTION — output_processor function
 # ---------------------------------------------------------------------------
 
-def group_ids_by_tier(results) -> list[dict]:
-    grouped = defaultdict(list)
-
-    for customer_id, tier in results:
-        grouped[tier].append(customer_id)
-
-    return [
-        {"tier": tier, "customer_ids": customer_ids}
-        for tier, customer_ids in grouped.items()
-    ]
 
 
 # ---------------------------------------------------------------------------
@@ -70,9 +60,17 @@ with DAG(
             WHERE is_active = TRUE
             ORDER BY tier, id
         """,
-        # EXERCISE 1 SOLUTION: wire in the output_processor
-        output_processor=group_ids_by_tier,
     )
+
+    @task
+    def group_by_tier(results: list) -> list[dict]:
+        grouped = defaultdict(list)
+        for customer_id, tier in results:
+            grouped[tier].append(customer_id)
+        return [
+            {"tier": tier, "customer_ids": customer_ids}
+            for tier, customer_ids in grouped.items()
+        ]
 
     # -----------------------------------------------------------------------
     # EXERCISE 2 SOLUTION — dynamic task with map_index_template
@@ -92,5 +90,5 @@ with DAG(
     # -----------------------------------------------------------------------
     # EXERCISE 3 SOLUTION — wire the dynamic expansion
     # -----------------------------------------------------------------------
-
-    send_outreach.expand(group=fetch_customers.output)
+    groups = group_by_tier(fetch_customers.output)
+    send_outreach.expand(group=groups)
