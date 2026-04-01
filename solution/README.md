@@ -1,4 +1,4 @@
-# Airflow 3.1 Exercise — Dynamic Task Mapping
+# Exercise — Dynamic Task Mapping
 
 ## Scenario
 
@@ -24,7 +24,8 @@ fetch_customers >> group_by_tier >> send_outreach[gold]
 
 ## Your tasks
 
+1. Trigger the `init_database` DAG to seed the databaase with records.
 1. In the **`group_by_tier`** task, transform the `defaultdict` so downstream tasks can be dynamically generated for each tier
-2. For the **`send_outreach`** task, set the `map_index_template` so each mapped instance
+1. For the **`send_outreach`** task, set the `map_index_template` so each mapped instance
    is labelled by tier name in the UI.
-3. Set the task dependencies so `send_outreach` is mapped to each tier.
+1. Set the task dependencies so `send_outreach` is mapped to each tier.

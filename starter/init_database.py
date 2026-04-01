@@ -16,7 +16,7 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 CONN_ID = "customer_subscriptions"
 
 with DAG(
-    dag_id="init_crm_database",
+    dag_id="init_database",
     schedule=None,
     start_date=datetime(2024, 1, 1),
     catchup=False,

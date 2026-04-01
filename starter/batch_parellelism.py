@@ -1,26 +1,4 @@
-# dags/customer_outreach_pipeline.py
-#
-# Airflow 3.1 Exercise — Dynamic Task Mapping with SQLExecuteQueryOperator
-#
-# Scenario
-# --------
-# A CRM database holds a `customers` table. Each customer belongs to a
-# subscription tier (gold, silver, bronze). This pipeline queries all active
-# customer IDs, groups them by tier, then processes each tier in parallel
-# using dynamically mapped tasks.
-#
-# Database schema (read-only reference — do not create this yourself):
-#
-#   customers
-#   ┌─────────────┬──────────────┬────────┬────────────┐
-#   │ id (int PK) │ name (text)  │ tier   │ is_active  │
-#   └─────────────┴──────────────┴────────┴────────────┘
-#   tier values: 'gold' | 'silver' | 'bronze'
-#
-# Note: downstream tasks operate on customer IDs only — names are not
-# selected or passed through this pipeline.
-#
-# Read README.md before editing this file.
+
 
 from __future__ import annotations
 
@@ -59,7 +37,7 @@ def _send_message(customer_id: int, message: str) -> None:
 with DAG(
     dag_id="customer_outreach_pipeline",
     schedule="@weekly",
-    start_date=datetime(2024, 1, 1),
+    start_date=datetime(2026, 1, 1),
     catchup=False,
     tags=["exercise", "dynamic-mapping"],
 ):
