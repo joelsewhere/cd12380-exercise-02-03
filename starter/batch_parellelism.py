@@ -1,8 +1,3 @@
-
-
-from __future__ import annotations
-
-from datetime import datetime
 from collections import defaultdict
 
 from airflow.sdk import DAG, task
@@ -13,7 +8,7 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 # Constants (do not modify)
 # ---------------------------------------------------------------------------
 
-CONN_ID = "crm_postgres"
+CONN_ID = "customer_subscriptions"
 OUTREACH_TEMPLATES = {
     "gold":   "You are a valued Gold member — here is your early access link: https://example.com/gold/{customer_id}",
     "silver": "Upgrade to Gold and unlock exclusive benefits: https://example.com/upgrade/{customer_id}",
@@ -90,7 +85,9 @@ with DAG(
     # Airflow UI labels each instance with its tier name rather than a
     # numeric index (e.g. "send_outreach[gold]" not "send_outreach[0]").
     # -----------------------------------------------------------------------
-    @task(map_index_template=None)  ### YOUR CODE HERE
+    @task(
+        ### YOUR CODE HERE
+        )  
     def send_outreach(group: dict) -> None:
         tier         = group["tier"]
         customer_ids = group["customer_ids"]
@@ -115,5 +112,5 @@ with DAG(
     #                                    >> send_outreach[bronze]
     # -----------------------------------------------------------------------
     sql_output = fetch_customers.output
-    
+
     ### YOUR CODE HERE

@@ -1,4 +1,4 @@
-# Exercise — Dynamic Task Mapping
+# Exercise: Dynamic Task Mapping
 
 ## Scenario
 
