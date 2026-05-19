@@ -51,8 +51,8 @@ with DAG(
     # -----------------------------------------------------------------------
     # Below a function is partially defined.
     # This function...
-    #    a. Receives the full list of (id, tier) tuples from fetch_customers
-    #    b. Constructs a defaultdict with the following structure
+    #    A. Receives the full list of (id, tier) tuples from fetch_customers
+    #    B. Constructs a defaultdict with the following structure
     #         {
     #           "tier_a": [customer_id, customer_id],
     #           "tier_b": [customer_id, customer_id],
@@ -67,13 +67,16 @@ with DAG(
     #       {"tier_c": "bronze", "customer_ids": [customer_id, customer_id]},
     #   ]
     # -----------------------------------------------------------------------
-    @task
+    @task             # A.
     def group_by_tier(results: list) -> list[dict]:
+
+        # B.
         grouped = defaultdict(list)
         for customer_id, tier in results:
             grouped[tier].append(customer_id)
 
-        # Return a list of dicts, one per tier, using `grouped`.
+        # TASK 1: Return a list of dicts with the structure detailed above
+        # The list should contain a single dictionary pre tier.
         ### YOUR CODE HERE
 
     # -----------------------------------------------------------------------
